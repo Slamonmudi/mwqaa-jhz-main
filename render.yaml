@@ -6,9 +6,8 @@ services:
     plan: free
     branch: main
     rootDir: artifacts/api-server
-    buildCommand: |
-      npm install --force
-      npm run build
+    installCommand: pnpm install --frozen-lockfile
+    buildCommand: pnpm run build
     startCommand: node dist/index.mjs
     healthCheckPath: /health
     envVars:
@@ -25,9 +24,8 @@ services:
     repo: https://github.com/Slamonmudi/mwqaa-jhz-main
     branch: main
     rootDir: artifacts/jahez-landing
-    buildCommand: |
-      npm install --force
-      npm run build
+    installCommand: pnpm install --frozen-lockfile
+    buildCommand: pnpm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
