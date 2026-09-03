@@ -61,6 +61,7 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Origin': 'https://stake-me.com',  // ✅ إضافة هذا السطر
         },
         body: JSON.stringify({
           username: username,
