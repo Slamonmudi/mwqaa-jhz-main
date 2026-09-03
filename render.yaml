@@ -5,30 +5,28 @@ services:
     repo: https://github.com/Slamonmudi/mwqaa-jhz-main
     plan: free
     branch: main
-    rootDir: artifacts/api-server
     buildCommand: |
-      npm install --force
-      npm run build
-    startCommand: node dist/index.mjs
+      corepack enable
+      corepack prepare pnpm@10.26.1 --activate
+      pnpm install --frozen-lockfile
+      pnpm --filter @workspace/api-server run build
+    startCommand: node artifacts/api-server/dist/index.mjs
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: TELEGRAM_CHAT_ID
-        sync: false
 
   - type: web
     name: stakeme-frontend
     runtime: static
     repo: https://github.com/Slamonmudi/mwqaa-jhz-main
     branch: main
-    rootDir: artifacts/jahez-landing
     buildCommand: |
-      npm install --force
-      npm run build
-    staticPublishPath: dist
+      corepack enable
+      corepack prepare pnpm@10.26.1 --activate
+      pnpm install --frozen-lockfile
+      pnpm --filter @workspace/jahez-landing run build
+    staticPublishPath: artifacts/jahez-landing/dist/public
     routes:
       - type: rewrite
         source: /*
