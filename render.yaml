@@ -12,12 +12,28 @@ services:
       pnpm install --frozen-lockfile
       pnpm run build
     startCommand: node dist/index.mjs
+    healthCheckPath: /health
     envVars:
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: TELEGRAM_CHAT_ID
-        sync: false
       - key: PORT
         value: 3000
       - key: NODE_ENV
         value: production
+      - key: FRONTEND_URL
+        sync: false
+
+  - type: web
+    name: stakeme-frontend
+    runtime: static
+    repo: https://github.com/Slamonmudi/mwqaa-jhz-main
+    branch: main
+    rootDir: artifacts/jahez-landing
+    buildCommand: |
+      corepack enable
+      corepack prepare pnpm@latest --activate
+      pnpm install --frozen-lockfile
+      pnpm run build
+    staticPublishPath: dist/public
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
