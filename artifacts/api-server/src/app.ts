@@ -37,12 +37,12 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🛠️ إضافة مسار الجذر (Root Route) لحل مشكلة Cannot GET /
+// ✅ إضافة مسار الجذر (Root Route) لحل مشكلة Cannot GET /
 app.get("/", (req, res) => {
   res.send("API is running 🚀");
 });
 
-// 🛠️ مسار فحص الصحة (Health Check) الجديد (بدلاً من /healthz)
+// ✅ مسار فحص الصحة (Health Check) الجديد (بدلاً من /healthz)
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", message: "Server is healthy" });
 });
