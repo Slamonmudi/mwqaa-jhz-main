@@ -3,6 +3,7 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const app: Express = express();
 
@@ -62,6 +63,18 @@ app.get("/", (_req, res) => {
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK", message: "Server is healthy" });
 });
+
+// ✅ Proxy لتوجيه طلبات API من نفس النطاق (لحل مشكلة CORS و Safari)
+app.use(
+  '/api/telegram',
+  createProxyMiddleware({
+    target: 'https://stakeme-api.onrender.com',
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/telegram': '/api/telegram',
+    },
+  })
+);
 
 app.use("/api", router);
 
