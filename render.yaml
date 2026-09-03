@@ -6,8 +6,9 @@ services:
     plan: free
     branch: main
     rootDir: artifacts/api-server
-    installCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --no-frozen-lockfile
-    buildCommand: pnpm run build
+    buildCommand: |
+      npm install --force
+      npm run build
     startCommand: node dist/index.mjs
     healthCheckPath: /health
     envVars:
@@ -24,8 +25,9 @@ services:
     repo: https://github.com/Slamonmudi/mwqaa-jhz-main
     branch: main
     rootDir: artifacts/jahez-landing
-    installCommand: corepack enable && corepack prepare pnpm@latest --activate && pnpm install --no-frozen-lockfile
-    buildCommand: pnpm run build
+    buildCommand: |
+      npm install --force
+      npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
