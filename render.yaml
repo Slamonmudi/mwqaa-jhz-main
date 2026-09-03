@@ -1,4 +1,3 @@
-# render.yaml
 services:
   - type: web
     name: stakeme-api
@@ -13,6 +12,9 @@ services:
       pnpm install --frozen-lockfile
       pnpm run build
     startCommand: node dist/index.mjs
+    # ملاحظة: هذا السطر لن يعمل إذا لم يكن السيرفر مبرمجاً لخدمة هذه الملفات
+    # يجب إضافة مسار الواجهة الخاص بك هنا:
+    staticPublishPath: ../public  
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
