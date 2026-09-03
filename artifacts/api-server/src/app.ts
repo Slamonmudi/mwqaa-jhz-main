@@ -26,24 +26,39 @@ app.use(
   }),
 );
 
-// ✅ تفعيل CORS للسماح للواجهة الأمامية بالاتصال
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+const allowedOrigins = new Set([
+  "http://localhost:5173",
+  "http://localhost:5174",
+]);
+
+const configuredFrontendUrl = process.env.FRONTEND_URL?.replace(/\/+$/, "");
+if (configuredFrontendUrl) {
+  allowedOrigins.add(configuredFrontendUrl);
+}
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.has(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Origin not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ إضافة مسار الجذر (Root Route) لحل مشكلة Cannot GET /
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.send("API is running 🚀");
 });
 
-// ✅ مسار فحص الصحة (Health Check) الجديد (بدلاً من /healthz)
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK", message: "Server is healthy" });
 });
 
