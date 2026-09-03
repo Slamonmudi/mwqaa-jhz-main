@@ -14,12 +14,8 @@ services:
     startCommand: node dist/index.mjs
     healthCheckPath: /health
     envVars:
-      - key: PORT
-        value: 3000
       - key: NODE_ENV
         value: production
-      - key: FRONTEND_URL
-        sync: false
 
   - type: web
     name: stakeme-frontend
