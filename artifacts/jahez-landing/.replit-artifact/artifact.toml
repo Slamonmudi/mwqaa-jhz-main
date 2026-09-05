@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "جاهز — موقع أعمال عربي"
+description = "صفحة هبوط عربية احترافية لعلامة أعمال عصرية، تعرض القيمة والخدمات وأعمال مختارة مع دعوات واضحة للتواصل والحجز."
+version = "1.0.0"
+id = "artifacts/jahez-landing"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25673
+
+[services.development]
+run = "pnpm --filter @workspace/jahez-landing run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/jahez-landing", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/jahez-landing/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25673"
+BASE_PATH = "/"

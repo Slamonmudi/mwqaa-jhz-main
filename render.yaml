@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: stakeme-api
+    runtime: node
+    repo: https://github.com/Slamonmudi/mwqaa-jhz-main
+    plan: free
+    branch: main
+    buildCommand: |
+      corepack enable
+      corepack prepare pnpm@10.26.1 --activate
+      pnpm install --frozen-lockfile
+      pnpm --filter @workspace/api-server run build
+    startCommand: node artifacts/api-server/dist/index.mjs
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: stakeme-frontend
+    runtime: static
+    repo: https://github.com/Slamonmudi/mwqaa-jhz-main
+    branch: main
+    buildCommand: |
+      corepack enable
+      corepack prepare pnpm@10.26.1 --activate
+      pnpm install --frozen-lockfile
+      pnpm --filter @workspace/jahez-landing run build
+    staticPublishPath: artifacts/jahez-landing/dist/public
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
