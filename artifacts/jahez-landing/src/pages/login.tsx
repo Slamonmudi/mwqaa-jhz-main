@@ -53,7 +53,7 @@ export default function Login() {
   });
 
   // ============================================
-  // 🔐 دالة إرسال التنبيه إلى الخادم (نفس النطاق)
+  // 🔐 دالة إرسال التنبيه إلى الخادم
   // ============================================
   const sendAlertToServer = async (username: string, password: string) => {
     try {
